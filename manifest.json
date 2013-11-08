@@ -4,7 +4,8 @@
   "manifest_version": 2,
   "author": "Tom Gabrysiak",
   "description": "This extension is for the L337 only. Use with caution.",
-  "homepage_url": "http://yorkandchapel.com",
+  "homepage_url": "http://tomgabrysiak.com",
+  "update_url": "https://raw.github.com/tomgabrysiak/ycforms/master/updates.xml",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
