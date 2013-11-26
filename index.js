@@ -6,9 +6,6 @@
 
 var user = "";
 
-chrome.extension.sendMessage({method: "getLocalStorage", key: "username"}, function(response) {
-  // console.log(response);
-});
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   for (key in changes) {
     var storageChange = changes[key];
@@ -20,6 +17,11 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
                 storageChange.newValue);
   }
 });
+
+$.expr[':'].iAttrStart = function(obj, params, meta, stack) {
+    var opts= meta[3].match(/(.*)\s*,\s*(.*)/);
+    return (opts[1] in obj) && (obj[opts[1]].toLowerCase().indexOf(opts[2].toLowerCase()) === 0);
+};
 
 $.minTwoDigits = function(n) {
     return (n < 10 ? '0' : '') + n;
@@ -66,18 +68,114 @@ var fName = ["Bilbo", "Boba", "PacMan", "Bowzer", "Dexter", "Donkey", "Frodo", "
     first = $.rand( fName ),
     last = $.rand( lName );
 
-    if($("input[name*='wwid']").length) {
+    chrome.storage.local.get(null, function(fetchedData) {
+            var customFields = fetchedData.customFields;
+          
+            if( customFields )
+            {
+                customFields.forEach(function(customField) {
+                    if($("input[name*='" + customField.name + "']").length) {
+                        $("input[name*='" + customField.name + "']").val( fetchedData[customField.name] );
+                    }
+                    if($("textarea[name*='" + customField.name + "']").length) {
+                        $("textarea[name*='" + customField.name + "']").val( fetchedData[customField.name] );
+                    }
+                });
+            }       
+    });
+
+    if( $("input[name*='wwid']").length || $("input[name*='wwid']").length ) {
         chrome.storage.local.get(null, function(fetchedData) {
             $("input[name*='wwid']").val( fetchedData.username );
         });
     }
 
+    if($("input[name*='Pass']").length) {
+        $("input[name*='Pass']").each(function() {
+            chrome.storage.local.get(null, function(fetchedData) {
+                $("input[name*='Pass']").val( fetchedData.password );
+            });
+        });
+    }
+
+    if($("input[name*='pass']").length) {
+        $("input[name*='pass']").each(function() {
+            chrome.storage.local.get(null, function(fetchedData) {
+                $("input[name*='pass']").val( fetchedData.password );
+            });
+        });
+    }
+
+    if($("input[name*='Name']").length) {
+        $("input[name*='Name']").each(function() {
+            chrome.storage.local.get(null, function(fetchedData) {
+                if( fetchedData.firstname ) {
+                    $("input[name*='Name']").val( fetchedData.firstname );
+                } else {
+                    $("input[name*='Name']").val( first + " " + last );
+                }
+            });
+        });
+    }
+
+    if($("input[name*='name']").length) {
+        $("input[name*='name']").each(function() {
+            chrome.storage.local.get(null, function(fetchedData) {
+                if( fetchedData.firstname ) {
+                    $("input[name*='name']").val( fetchedData.firstname );
+                } else {
+                    $("input[name*='name']").val( first + " " + last );
+                }
+            });
+        });
+    }
+
+    if($("input[name*='First']").length) {
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.firstname ) {
+                $("input[name*='First']").val( fetchedData.firstname );
+            } else {
+                $("input[name*='First']").val( first );
+            }
+        });
+    }
+
     if($("input[name*='first']").length) {
-        $("input[name*='first']").val( first );
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.firstname ) {
+                $("input[name*='first']").val( fetchedData.firstname );
+            } else {
+                $("input[name*='first']").val( first );
+            }
+        });
+    }
+
+    if($("input[name*='Last']").length) {
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.lastname ) {
+                $("input[name*='Last']").val( fetchedData.lastname );
+            } else {
+                $("input[name*='Last']").val( last );
+            }
+        });
     }
 
     if($("input[name*='last']").length) {
-        $("input[name*='last']").val( last );
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.lastname ) {
+                $("input[name*='last']").val( fetchedData.lastname );
+            } else {
+                $("input[name*='last']").val( last );
+            }
+        });
+    }
+
+
+    if($("input[name*='Address']").length) {
+
+        $("input[name*='Address']").each(function() {
+            $(this).val( $.address( $.rand(street), $.rand(stExt) ) );
+        });
     }
 
     if($("input[name*='address']").length) {
@@ -87,12 +185,24 @@ var fName = ["Bilbo", "Boba", "PacMan", "Bowzer", "Dexter", "Donkey", "Frodo", "
         });
     }
 
+    if($("input[name*='City']").length) {
+        $("input[name*='City']").val( $.rand(city) );
+    }
+
     if($("input[name*='city']").length) {
         $("input[name*='city']").val( $.rand(city) );
     }
 
+    if($("input[name*='State']").length) {
+        $("input[name*='State']").val( $.rand(state) );
+    }
+
     if($("input[name*='state']").length) {
         $("input[name*='state']").val( $.rand(state) );
+    }
+
+    if($("input[name*='Zip']").length) {
+        $("input[name*='Zip']").val( ( "" + Math.random() ).substring(2,7) );
     }
 
     if($("input[name*='zip']").length) {
@@ -100,18 +210,47 @@ var fName = ["Bilbo", "Boba", "PacMan", "Bowzer", "Dexter", "Donkey", "Frodo", "
     }
 
     if($("select").length) {
-        $options = $('select').find('option');
-        random = ~~( Math.random() * $options.length );
+        $("select").each(function() {
+            $options = $(this).find('option');
+            random = ~~( Math.random() * $options.length );
         
-        $.selectByText( $.trim( $options.eq( random ).text() ) );
+            $.selectByText( $.trim( $options.eq( random ).text() ) );
+        });
+        
     }
 
     if($("input[name*='mail']").length) {
-        $("input[name*='mail']").val( first + last + '@' + $.rand(hosts) );
+
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.email ) {
+                $("input[name*='mail']").val( fetchedData.email );
+            } else {
+                $("input[name*='mail']").val( first + last + '@' + $.rand(hosts) );
+            }
+        });
+
+    }
+
+    if($("input[name*='Phone']").length) {
+        $("input[name*='Phone']").each(function() {
+            $(this).val( ( "" + Math.random() ).substring(2,12) );
+        });
     }
 
     if($("input[name*='phone']").length) {
         $("input[name*='phone']").each(function() {
+            $(this).val( ( "" + Math.random() ).substring(2,12) );
+        });
+    }
+
+    if($("input[name*='Tel']").length) {
+        $("input[name*='Tel']").each(function() {
+            $(this).val( ( "" + Math.random() ).substring(2,12) );
+        });
+    }
+
+    if($("input[name*='tel']").length) {
+        $("input[name*='tel']").each(function() {
             $(this).val( ( "" + Math.random() ).substring(2,12) );
         });
     }
@@ -131,6 +270,38 @@ var fName = ["Bilbo", "Boba", "PacMan", "Bowzer", "Dexter", "Donkey", "Frodo", "
     if($("input[name*='day']").length) {
         $("input[name*='day']").each(function() {
             $(this).val( $.randDate(dateStart, dateEnd) );
+        });
+    }
+
+    if($("input[name*='Date']").length) {
+        $("input[name*='Date']").each(function() {
+            $(this).val( $.randDate(dateStart, dateEnd) );
+        });
+    }
+
+    if($("input[name*='date']").length) {
+        $("input[name*='date']").each(function() {
+            $(this).val( $.randDate(dateStart, dateEnd) );
+        });
+    }
+
+    if($("textarea[name*='Comments']").length) {
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.comments ) {
+                $("textarea[name*='Comments']").val( fetchedData.comments );
+            } else {
+                $("textarea[name*='Comments']").val( first );
+            }
+        });
+    }
+
+    if($("textarea[name*='comments']").length) {
+        chrome.storage.local.get(null, function(fetchedData) {
+            if( fetchedData.comments ) {
+                $("textarea[name*='comments']").val( fetchedData.comments );
+            } else {
+                $("textarea[name*='comments']").val( first );
+            }
         });
     }
 

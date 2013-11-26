@@ -21,6 +21,7 @@
         },
         
         "create": function (params) {
+            
             var tab,
                 group,
                 row,
@@ -85,6 +86,7 @@
                 "text",
                 "button",
                 "slider",
+                "popup",
                 "popupButton"
             ];
             type = settings[0].params.type;

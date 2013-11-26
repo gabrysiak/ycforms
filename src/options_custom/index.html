@@ -4,7 +4,7 @@
 // License: LGPL v2.1
 -->
 <!DOCTYPE html>
-<html>
+<html ng-app="ycforms" ng-csp="">
     <head>
         <meta charset="utf-8">
         <title id="title"></title>
@@ -15,8 +15,11 @@
         <link rel="stylesheet" href="css/main.css" media="screen">
         <link rel="stylesheet" href="css/setting.css" media="screen">
         <link rel="stylesheet" href="custom.css" media="screen">
-        
+        <!-- <link rel="stylesheet" href="lib/bootstrap.min.css" media="screen"> -->
+
+
         <!-- JavaScripts -->
+        <script src="lib/angular.js"></script>
         <script src="lib/mootools-core.js"></script>
         <script src="lib/store.js"></script>
         <script src="js/classes/tab.js"></script>
@@ -27,6 +30,9 @@
         <script src="js/i18n.js"></script>
         <script src="manifest.js"></script>
         <script src="settings.js"></script>
+
+        <script src="lib/ui-bootstrap-tpls-0.6.0.js"></script>
+        <script src="main.js"></script>
     </head>
     <body class="no-select">
         <div id="sidebar" class="fancy">
@@ -37,10 +43,13 @@
                 </div>
             </div>
         </div>
-        <div id="content">
+        <div id="content" ng-controller="ContentCtrl">
+
             <div id="search-result-container" class="tab-content">
                 <h2 id="search-label"></h2>
             </div>
+            {{item.value}} {{item.text}}
         </div>
+        </script>
     </body>
 </html>

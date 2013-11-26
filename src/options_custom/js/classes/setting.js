@@ -106,6 +106,60 @@
             this.container.inject(this.bundle);
         }
     });
+
+    Bundle.Popup = new Class({
+        // label, text
+        // action -> click
+        "Extends": Bundle,
+        "get": undefined,
+        "set": undefined,
+        
+        "initialize": function (params) {
+            this.params = params;
+            this.params.searchString = "•" + this.params.tab + "•" + this.params.group + "•";
+            
+            this.createDOM();
+            this.setupDOM();
+            this.addEvents();
+
+            if (this.params.id !== undefined) {
+                this.element.set("id", this.params.id);
+            }
+            
+            this.params.searchString = this.params.searchString.toLowerCase();
+        },
+        
+        "createDOM": function () {
+            this.bundle = new Element("div", {
+                "class": "setting bundle button"
+            });
+            
+            this.container = new Element("div", {
+                "class": "setting container button"
+            });
+            
+            this.label = new Element("label", {
+                "class": "setting label button"
+            });
+        },
+        
+        "setupDOM": function () {
+            if (this.params.label !== undefined) {
+                this.label.set("html", this.params.label);
+                this.label.inject(this.container);
+                this.params.searchString += this.params.label + "•";
+            }
+
+            this.element.inject(this.container);
+            this.container.inject(this.bundle);
+        },
+        
+        "addEvents": function () {
+            this.element.addEvent("click", (function () {
+                this.fireEvent("action");
+            }).bind(this));
+        }
+    });
     
     Bundle.Button = new Class({
         // label, text
@@ -159,7 +213,7 @@
                 this.element.set("value", this.params.text);
                 this.params.searchString += this.params.text + "•";
             }
-            
+
             this.element.inject(this.container);
             this.container.inject(this.bundle);
         },
@@ -689,6 +743,7 @@
             types = {
                 "description": "Description",
                 "button": "Button",
+                "popup": "Popup",
                 "text": "Text",
                 "textarea": "Textarea",
                 "checkbox": "Checkbox",
